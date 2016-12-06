@@ -78,10 +78,11 @@ class ArticlesProvider(AbstractProvider):
 
 class TextNormalizer(object):
     def normalize_text(self, text):
-        normalized_text = self._strip_accents(text).encode(commons.TARGET_ARTICLE_ENCODING)
-        normalized_text = normalized_text.replace("\\n", ' ')
+        normalized_text = self._strip_accents(text).encode(commons.TARGET_ARTICLE_ENCODING).lower()
+        normalized_text = normalized_text.replace("\n", ' ')
         for punctuation_character in commons.PUNCTUATION_SIGNS:
             normalized_text = normalized_text.replace(punctuation_character, '')
+        normalized_text = ' '.join(word for word in normalized_text.split(' ') if len(word) > 3 and not word.isdigit())
         return normalized_text
 
     def _strip_accents(self, s):
