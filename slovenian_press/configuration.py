@@ -1,7 +1,7 @@
 import json
 import pickle
-import unicodedata
 import commons
+import text
 from commons import Article
 
 
@@ -59,34 +59,28 @@ class ArticlesProvider(AbstractProvider):
         """
         :rtype: ArticlesSetModel
         """
-        return ArticlesSetModel(self._read_json_structure())
+        return ArticlesSetModel(self._process_data())
 
-    def _read_json_structure(self):
+    def _process_data(self):
         """
         :rtype: list[Article]
         """
-        text_normalizer = TextNormalizer()
-        return [self._extract_article_from_dict(article_dict, text_normalizer) for article_dict in self._datasource.read_json()]
+        text_processor = text.TextProcessingChain()
+        text_processor.register(text.AccentsRemover())
+        text_processor.register(text.TextNormalizer())
+
+        return [self._extract_article_from_dict(article_dict, text_processor) for article_dict in self._datasource.read_json()]
 
     @staticmethod
-    def _extract_article_from_dict(article_dict, text_normalizer):
+    def _extract_article_from_dict(article_dict, text_processor):
         id = str(article_dict['id'][0])
-        text = text_normalizer.normalize_text(article_dict.get('text', article_dict.get('headline'))[0])
+        text = ArticlesProvider._process_text(article_dict.get('text', article_dict.get('headline'))[0], text_processor)
         category = str(article_dict.get('specialCoverage', [''])[0])
         return Article(id, text, category)
 
-
-class TextNormalizer(object):
-    def normalize_text(self, text):
-        normalized_text = self._strip_accents(text).encode(commons.TARGET_ARTICLE_ENCODING).lower()
-        normalized_text = normalized_text.replace("\n", ' ')
-        for punctuation_character in commons.PUNCTUATION_SIGNS:
-            normalized_text = normalized_text.replace(punctuation_character, '')
-        normalized_text = ' '.join(word for word in normalized_text.split(' ') if len(word) > 3 and not word.isdigit())
-        return normalized_text
-
-    def _strip_accents(self, s):
-        return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+    @staticmethod
+    def _process_text(text, text_processor):
+        return text_processor.process(text)
 
 
 # Interface compatible with return type of sklearn.datasets.fetch_20newsgroups

@@ -8,4 +8,4 @@ OUTPUT_FILE_PATH = '../output.csv'
 SOURCE_ARTICLE_ENCODING = 'windows-1250'
 TARGET_ARTICLE_ENCODING = 'utf-8'
 Article = collections.namedtuple('Article', ('id', 'text', 'category'))
-PUNCTUATION_SIGNS = ".,\"'?!()"
+PUNCTUATION_SIGNS = ".,\"'?!()-<>"
