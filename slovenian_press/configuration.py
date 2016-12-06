@@ -65,7 +65,7 @@ class ArticlesProvider(AbstractProvider):
         """
         :rtype: list[tuple[int, string]]
         """
-        return [(str(article['specialCoverage'][0]), self._normalize_text(article.get('text', article.get('headline'))[0]))
+        return [(str(article.get('specialCoverage', [''])[0]), self._normalize_text(article.get('text', article.get('headline'))[0]))
                 for article in self._datasource.read_json()]
 
     def _normalize_text(self, text):
@@ -95,3 +95,8 @@ def read_articles_set_from_file(file_path):
 def save_model(model, output_file_path):
     with open(output_file_path, 'w') as f:
         pickle.dump(model, f)
+
+
+def read_model(input_file_path):
+    with open(input_file_path, 'r') as f:
+        return pickle.load(f)
