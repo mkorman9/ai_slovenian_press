@@ -5,20 +5,16 @@ from configuration import ArticlesSetModel
 
 class FeatureExtractor(object):
     """ Feature extraction using Bags of Words strategy """
-    @staticmethod
-    def fit(training_set):
+    def __init__(self, training_set):
         """
         :type training_set: ArticlesSetModel
-        :rtype: FeatureExtractor
         """
-        feature_extractor = FeatureExtractor()
-        feature_extractor.training_set = training_set
+        self.training_set = training_set
 
-        feature_extractor.count_vectorizer = CountVectorizer()
-        vocabulary = feature_extractor.count_vectorizer.fit_transform(training_set.data)
-        feature_extractor.features_transformer = TfidfTransformer().fit(vocabulary)
-        feature_extractor.extracted_training_set_features = feature_extractor.features_transformer.transform(vocabulary)
-        return feature_extractor
+        self.count_vectorizer = CountVectorizer()
+        vocabulary = self.count_vectorizer.fit_transform(training_set.data)
+        self.features_transformer = TfidfTransformer().fit(vocabulary)
+        self.extracted_training_set_features = self.features_transformer.transform(vocabulary)
 
     def extract_features(self, dataset):
         """
@@ -30,17 +26,13 @@ class FeatureExtractor(object):
 
 
 class LearningModel(object):
-    @staticmethod
-    def fit(feature_extractor):
+    def __init__(self, feature_extractor):
         """
         :type feature_extractor: FeatureExtractor
-        :rtype: LearningModel
         """
-        model = LearningModel()
-        model.feature_extractor = feature_extractor
-        model.bayes_model = MultinomialNB().fit(model.feature_extractor.extracted_training_set_features,
-                                                model.feature_extractor.training_set.target_names)
-        return model
+        self.feature_extractor = feature_extractor
+        self.bayes_model = MultinomialNB().fit(self.feature_extractor.extracted_training_set_features,
+                                               self.feature_extractor.training_set.target_names)
 
     def predict(self, testing_set):
         extracted_features = self.feature_extractor.extract_features(testing_set.data)

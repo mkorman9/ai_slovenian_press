@@ -71,7 +71,7 @@ class ArticlesProvider(AbstractProvider):
                 for article in self._datasource.read_json()]
 
     def _normalize_text(self, text):
-        normalized_text = text.replace("\\n", "\n").encode(TARGET_ARTICLE_ENCODING)
+        normalized_text = text.encode(TARGET_ARTICLE_ENCODING).replace("\\n", ' ')
         return normalized_text
 
 
