@@ -1,4 +1,5 @@
 import configuration
+import output
 
 
 def main():
@@ -6,8 +7,7 @@ def main():
     learning_model = configuration.read_entity_from_file('../model.bin')
 
     predicted = learning_model.predict(testing_set)
-    for id, category in zip(testing_set.id, predicted):
-        print('{0} -> {1}'.format(id, category))
+    output.save_results_to_csv_file('../output.csv', zip(testing_set.id, predicted))
 
 if __name__ == '__main__':
     main()
