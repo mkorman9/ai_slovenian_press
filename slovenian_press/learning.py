@@ -31,8 +31,9 @@ class LearningModel(object):
         :type feature_extractor: FeatureExtractor
         """
         self.feature_extractor = feature_extractor
-        self.bayes_model = MLPClassifier().fit(self.feature_extractor.extracted_training_set_features,
-                                               self.feature_extractor.training_set.target_names)
+        classifier = MLPClassifier()
+        self.bayes_model = classifier.fit(self.feature_extractor.extracted_training_set_features,
+                                          self.feature_extractor.training_set.target_names)
 
     def predict(self, testing_set):
         extracted_features = self.feature_extractor.extract_features(testing_set.data)

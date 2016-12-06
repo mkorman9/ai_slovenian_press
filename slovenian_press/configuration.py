@@ -1,11 +1,8 @@
 import json
 import pickle
 import unicodedata
-import collections
-
-SOURCE_ARTICLE_ENCODING = 'windows-1250'
-TARGET_ARTICLE_ENCODING = 'utf-8'
-Article = collections.namedtuple('Article', ('id', 'text', 'category'))
+import commons
+from commons import Article
 
 
 class AbstractDatasourceReader(object):
@@ -30,7 +27,7 @@ class FileDatasourceReader(AbstractDatasourceReader):
 
     def read_json(self):
         with open(self._file_path, 'r') as f:
-            return json.load(f, encoding=SOURCE_ARTICLE_ENCODING)
+            return json.load(f, encoding=commons.SOURCE_ARTICLE_ENCODING)
 
 
 class FileObjectPersistance(AbstractObjectPersistance):
@@ -81,9 +78,9 @@ class ArticlesProvider(AbstractProvider):
 
 class TextNormalizer(object):
     def normalize_text(self, text):
-        normalized_text = self._strip_accents(text).encode(TARGET_ARTICLE_ENCODING)
+        normalized_text = self._strip_accents(text).encode(commons.TARGET_ARTICLE_ENCODING)
         normalized_text = normalized_text.replace("\\n", ' ')
-        for punctuation_character in ".?!()":
+        for punctuation_character in commons.PUNCTUATION_SIGNS:
             normalized_text = normalized_text.replace(punctuation_character, '')
         return normalized_text
 
