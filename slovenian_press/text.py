@@ -25,6 +25,7 @@ class TextNormalizer(TextProcessor):
         for punctuation_character in commons.PUNCTUATION_SIGNS:
             normalized_text = normalized_text.replace(punctuation_character, '')
         normalized_text = ' '.join(word for word in normalized_text.split(' ') if len(word) > 3 and not word.isdigit())
+        normalized_text = ' '.join(word[:3] for word in normalized_text.split(' ') if len(word) > 5)
         return normalized_text
 
 
