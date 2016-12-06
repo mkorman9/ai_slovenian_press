@@ -63,9 +63,11 @@ class ArticlesProvider(AbstractProvider):
 
     def _read_json_structure(self):
         """
-        :rtype: list[tuple[int, string]]
+        :rtype: list[tuple[string, string, string]]
         """
-        return [(str(article.get('specialCoverage', [''])[0]), self._normalize_text(article.get('text', article.get('headline'))[0]))
+        return [(str(article['id'][0]),
+                 str(article.get('specialCoverage', [''])[0]),
+                 self._normalize_text(article.get('text', article.get('headline'))[0]))
                 for article in self._datasource.read_json()]
 
     def _normalize_text(self, text):
@@ -79,8 +81,9 @@ class ArticlesSetModel(object):
         """
         :type input_data: list[tuple[int, string]]
         """
-        self.target_names = [key for key, data in input_data]
-        self.data = [data for key, data in input_data]
+        self.id = [id for id, _, _ in input_data]
+        self.target_names = [category for _, category, _ in input_data]
+        self.data = [data for _, _, data in input_data]
 
 
 def read_articles_set_from_file(file_path):
