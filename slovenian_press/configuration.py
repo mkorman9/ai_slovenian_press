@@ -79,7 +79,7 @@ class ArticlesProvider(AbstractProvider):
 class ArticlesSetModel(object):
     def __init__(self, input_data):
         """
-        :type input_data: list[tuple[int, string]]
+        :type input_data: list[tuple[string, string, string]]
         """
         self.id = [id for id, _, _ in input_data]
         self.target_names = [category for _, category, _ in input_data]
