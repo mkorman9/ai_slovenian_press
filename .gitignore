@@ -6,3 +6,4 @@ framepy.egg-info/
 dist/
 build/
 model.bin
+output.json
