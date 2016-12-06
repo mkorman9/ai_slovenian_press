@@ -1,4 +1,5 @@
 import json
+import pickle
 
 SOURCE_ARTICLE_ENCODING = 'windows-1250'
 TARGET_ARTICLE_ENCODING = 'utf-8'
@@ -23,9 +24,11 @@ class FileDatasourceReader(AbstractDatasourceReader):
         self._file_path = file_path
 
     def read_all_lines(self):
+        lines = []
         with open(self._file_path, 'r') as f:
             for line in f.readlines():
-                yield line
+                lines.append(line)
+        return lines
 
     def read_json(self):
         with open(self._file_path, 'r') as f:
@@ -80,9 +83,15 @@ class ArticlesSetModel(object):
         self.data = [data for key, data in input_data]
 
 
+
 def read_categories_from_file(file_path):
     return CategoriesProvider(FileDatasourceReader(file_path)).provide()
 
 
 def read_articles_set_from_file(file_path):
     return ArticlesProvider(FileDatasourceReader(file_path)).provide()
+
+
+def save_model(model, output_file_path):
+    with open(output_file_path, 'w') as f:
+        pickle.dump(model, f)
