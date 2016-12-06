@@ -1,5 +1,5 @@
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.neural_network import MLPClassifier
 from configuration import ArticlesSetModel
 
 
@@ -31,7 +31,7 @@ class LearningModel(object):
         :type feature_extractor: FeatureExtractor
         """
         self.feature_extractor = feature_extractor
-        self.bayes_model = MultinomialNB().fit(self.feature_extractor.extracted_training_set_features,
+        self.bayes_model = MLPClassifier().fit(self.feature_extractor.extracted_training_set_features,
                                                self.feature_extractor.training_set.target_names)
 
     def predict(self, testing_set):
