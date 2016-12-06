@@ -1,12 +1,43 @@
 import json
 
+SOURCE_ARTICLE_ENCODING = 'windows-1250'
+TARGET_ARTICLE_ENCODING = 'utf-8'
+
+
+class AbstractDatasourceReader(object):
+    def read_all_lines(self):
+        """
+        :rtype: list[string]
+        """
+        raise NotImplementedError()
+
+    def read_json(self):
+        """
+        :rtype: dict
+        """
+        raise NotImplementedError()
+
+
+class FileDatasourceReader(AbstractDatasourceReader):
+    def __init__(self, file_path):
+        self._file_path = file_path
+
+    def read_all_lines(self):
+        with open(self._file_path, 'r') as f:
+            for line in f.readlines():
+                yield line
+
+    def read_json(self):
+        with open(self._file_path, 'r') as f:
+            return json.load(f, encoding=SOURCE_ARTICLE_ENCODING)
+
 
 class AbstractProvider(object):
-    def __init__(self, file_path):
+    def __init__(self, datasource):
         """
-        :type file_path: string
+        :type datasource: AbstractDatasourceReader
         """
-        self._file_path = file_path
+        self._datasource = datasource
 
     def provide(self):
         raise NotImplementedError()
@@ -17,14 +48,10 @@ class CategoriesProvider(AbstractProvider):
         """
         :rtype: list[string]
         """
-        with open(self._file_path, 'r') as f:
-            return [id for id, _ in (line.split(';') for line in f.readlines()[1:])]
+        return [id for id, _ in (line.split(';') for line in self._datasource.read_all_lines()[1:])]
 
 
 class ArticlesProvider(AbstractProvider):
-    SOURCE_ARTICLE_ENCODING = 'windows-1250'
-    TARGET_ARTICLE_ENCODING = 'utf-8'
-
     def provide(self):
         """
         :rtype: ArticlesSetModel
@@ -35,14 +62,11 @@ class ArticlesProvider(AbstractProvider):
         """
         :rtype: list[tuple[int, string]]
         """
-        with open(self._file_path, 'r') as f:
-            structure = json.load(f, encoding=self.SOURCE_ARTICLE_ENCODING)
-            return [(article['specialCoverage'][0],
-                     self._normalize_text(article.get('text', article.get('headline'))[0]))
-                    for article in structure]
+        return [(str(article['specialCoverage'][0]), self._normalize_text(article.get('text', article.get('headline'))[0]))
+                for article in self._datasource.read_json()]
 
     def _normalize_text(self, text):
-        normalized_text = text.replace("\\n", "\n").encode(self.TARGET_ARTICLE_ENCODING)
+        normalized_text = text.replace("\\n", "\n").encode(TARGET_ARTICLE_ENCODING)
         return normalized_text
 
 
