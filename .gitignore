@@ -1,0 +1,8 @@
+.DS_STORE
+*.pyc
+*.iml
+.idea/
+framepy.egg-info/
+dist/
+build/
+
