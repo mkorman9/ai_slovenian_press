@@ -46,6 +46,7 @@ class ArticlesProvider(AbstractProvider):
         return normalized_text
 
 
+# Interface compatible with return type of sklearn.datasets.fetch_20newsgroups
 class ArticlesSetModel(object):
     def __init__(self, input_data):
         """
