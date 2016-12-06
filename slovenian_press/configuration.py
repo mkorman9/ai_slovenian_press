@@ -1,8 +1,11 @@
 import json
 import pickle
+import unicodedata
+import collections
 
 SOURCE_ARTICLE_ENCODING = 'windows-1250'
 TARGET_ARTICLE_ENCODING = 'utf-8'
+Article = collections.namedtuple('Article', ('id', 'text', 'category'))
 
 
 class AbstractDatasourceReader(object):
@@ -63,27 +66,40 @@ class ArticlesProvider(AbstractProvider):
 
     def _read_json_structure(self):
         """
-        :rtype: list[tuple[string, string, string]]
+        :rtype: list[Article]
         """
-        return [(str(article['id'][0]),
-                 str(article.get('specialCoverage', [''])[0]),
-                 self._normalize_text(article.get('text', article.get('headline'))[0]))
-                for article in self._datasource.read_json()]
+        text_normalizer = TextNormalizer()
+        return [self._extract_article_from_dict(article_dict, text_normalizer) for article_dict in self._datasource.read_json()]
 
-    def _normalize_text(self, text):
-        normalized_text = text.encode(TARGET_ARTICLE_ENCODING).replace("\\n", ' ')
+    @staticmethod
+    def _extract_article_from_dict(article_dict, text_normalizer):
+        id = str(article_dict['id'][0])
+        text = text_normalizer.normalize_text(article_dict.get('text', article_dict.get('headline'))[0])
+        category = str(article_dict.get('specialCoverage', [''])[0])
+        return Article(id, text, category)
+
+
+class TextNormalizer(object):
+    def normalize_text(self, text):
+        normalized_text = self._strip_accents(text).encode(TARGET_ARTICLE_ENCODING)
+        normalized_text = normalized_text.replace("\\n", ' ')
+        for punctuation_character in ".?!()":
+            normalized_text = normalized_text.replace(punctuation_character, '')
         return normalized_text
+
+    def _strip_accents(self, s):
+        return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
 
 # Interface compatible with return type of sklearn.datasets.fetch_20newsgroups
 class ArticlesSetModel(object):
     def __init__(self, input_data):
         """
-        :type input_data: list[tuple[string, string, string]]
+        :type input_data: list[Article]
         """
-        self.id = [id for id, _, _ in input_data]
-        self.target_names = [category for _, category, _ in input_data]
-        self.data = [data for _, _, data in input_data]
+        self.id = [article.id for article in input_data]
+        self.target_names = [article.category for article in input_data]
+        self.data = [article.text for article in input_data]
 
 
 def read_articles_set_from_file(file_path):

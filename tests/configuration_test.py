@@ -9,16 +9,16 @@ class ConfigurationTest(unittest.TestCase):
         self._test_articles_provider([], [], [], [])
 
     def test_articles_should_be_retrieved_from_datasource_with_single_record(self):
-        self._test_articles_provider([{'specialCoverage': [123], 'text': ['xyz'], 'id': ['456']}],
+        self._test_articles_provider([{'specialCoverage': [123], 'text': [u'xyz'], 'id': ['456']}],
                                      ['456'], ['123'], ['xyz'])
 
     def test_articles_should_be_retrieved_from_datasource_with_multiple_records(self):
-        self._test_articles_provider([{'specialCoverage': [123], 'text': ['xyz'], 'id': ['456']},
-                                      {'specialCoverage': [666], 'text': ['zyx'], 'id': ['567']}],
+        self._test_articles_provider([{'specialCoverage': [123], 'text': [u'xyz'], 'id': ['456']},
+                                      {'specialCoverage': [666], 'text': [u'zyx'], 'id': ['567']}],
                                      ['456', '567'], ['123', '666'], ['xyz', 'zyx'])
 
     def test_articles_should_be_retrieved_from_datasource_with_record_with_no_text_field(self):
-        self._test_articles_provider([{'specialCoverage': [123], 'headline': ['xyz'], 'id': ['456']}],
+        self._test_articles_provider([{'specialCoverage': [123], 'headline': [u'xyz'], 'id': ['456']}],
                                      ['456'], ['123'], ['xyz'])
 
     def _test_articles_provider(self, input, expected_ids, expected_target_names, expected_data):
