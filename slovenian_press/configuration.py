@@ -78,3 +78,11 @@ class ArticlesSetModel(object):
         """
         self.target_names = [key for key, data in input_data]
         self.data = [data for key, data in input_data]
+
+
+def read_categories_from_file(file_path):
+    return CategoriesProvider(FileDatasourceReader(file_path)).provide()
+
+
+def read_articles_set_from_file(file_path):
+    return ArticlesProvider(FileDatasourceReader(file_path)).provide()
