@@ -27,14 +27,29 @@ class ArticlesProvider(AbstractProvider):
 
     def provide(self):
         """
+        :rtype: ArticlesSetModel
+        """
+        return ArticlesSetModel(self._read_json_structure())
+
+    def _read_json_structure(self):
+        """
         :rtype: list[tuple[int, string]]
         """
         with open(self._file_path, 'r') as f:
             structure = json.load(f, encoding=self.SOURCE_ARTICLE_ENCODING)
             return [(article['specialCoverage'][0],
-                        self._normalize_text(article.get('text', article.get('headline'))[0]))
+                     self._normalize_text(article.get('text', article.get('headline'))[0]))
                     for article in structure]
 
     def _normalize_text(self, text):
         normalized_text = text.replace("\\n", "\n").encode(self.TARGET_ARTICLE_ENCODING)
         return normalized_text
+
+
+class ArticlesSetModel(object):
+    def __init__(self, input_data):
+        """
+        :type input_data: list[tuple[int, string]]
+        """
+        self.target_names = [key for key, data in input_data]
+        self.data = [data for key, data in input_data]
