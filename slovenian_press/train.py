@@ -1,27 +1,13 @@
 import configuration
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.naive_bayes import MultinomialNB
-
-
-# use 'bags of words' strategy
-def extract_text_features(training_set):
-    count_vect = CountVectorizer()
-    training = count_vect.fit_transform(training_set.data)
-    features_transformer = TfidfTransformer().fit(training)
-    return features_transformer.transform(training)
-
-
-def train_model(features, categories):
-    return MultinomialNB().fit(features, categories)
+from slovenian_press.learning import FeatureExtractor, LearningModel
 
 
 def main():
-    #categories = configuration.read_categories_from_file('../data/sta-special-articles-2015-specialCoverageDict.csv')
     training_set = configuration.read_articles_set_from_file('../data/sta-special-articles-2015-training.json')
+    feature_extractor = FeatureExtractor.fit(training_set)
+    learning_model = LearningModel.fit(feature_extractor)
 
-    features = extract_text_features(training_set)
-    model = train_model(features, training_set.target_names)
-    configuration.save_model(model, '../model.bin')
+    configuration.save_entity_to_file(learning_model, '../model.bin')
 
 if __name__ == '__main__':
     main()

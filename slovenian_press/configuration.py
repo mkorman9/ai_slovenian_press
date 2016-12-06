@@ -6,12 +6,6 @@ TARGET_ARTICLE_ENCODING = 'utf-8'
 
 
 class AbstractDatasourceReader(object):
-    def read_all_lines(self):
-        """
-        :rtype: list[string]
-        """
-        raise NotImplementedError()
-
     def read_json(self):
         """
         :rtype: dict
@@ -19,20 +13,34 @@ class AbstractDatasourceReader(object):
         raise NotImplementedError()
 
 
+class AbstractObjectPersistance(object):
+    def write(self, entity):
+        raise NotImplementedError()
+
+    def read(self):
+        raise NotImplementedError()
+
+
 class FileDatasourceReader(AbstractDatasourceReader):
     def __init__(self, file_path):
         self._file_path = file_path
 
-    def read_all_lines(self):
-        lines = []
-        with open(self._file_path, 'r') as f:
-            for line in f.readlines():
-                lines.append(line)
-        return lines
-
     def read_json(self):
         with open(self._file_path, 'r') as f:
             return json.load(f, encoding=SOURCE_ARTICLE_ENCODING)
+
+
+class FileObjectPersistance(AbstractObjectPersistance):
+    def __init__(self, file_path):
+        self._file_path = file_path
+
+    def write(self, entity):
+        with open(self._file_path, 'w') as f:
+            pickle.dump(entity, f)
+
+    def read(self):
+        with open(self._file_path, 'r') as f:
+            return pickle.load(f)
 
 
 class AbstractProvider(object):
@@ -44,14 +52,6 @@ class AbstractProvider(object):
 
     def provide(self):
         raise NotImplementedError()
-
-
-class CategoriesProvider(AbstractProvider):
-    def provide(self):
-        """
-        :rtype: list[string]
-        """
-        return [id for id, _ in (line.split(';') for line in self._datasource.read_all_lines()[1:])]
 
 
 class ArticlesProvider(AbstractProvider):
@@ -83,20 +83,13 @@ class ArticlesSetModel(object):
         self.data = [data for key, data in input_data]
 
 
-
-def read_categories_from_file(file_path):
-    return CategoriesProvider(FileDatasourceReader(file_path)).provide()
-
-
 def read_articles_set_from_file(file_path):
     return ArticlesProvider(FileDatasourceReader(file_path)).provide()
 
 
-def save_model(model, output_file_path):
-    with open(output_file_path, 'w') as f:
-        pickle.dump(model, f)
+def save_entity_to_file(model, output_file_path):
+    FileObjectPersistance(output_file_path).write(model)
 
 
-def read_model(input_file_path):
-    with open(input_file_path, 'r') as f:
-        return pickle.load(f)
+def read_entity_from_file(input_file_path):
+    return FileObjectPersistance(input_file_path).read()

@@ -5,15 +5,6 @@ from assertpy import assert_that
 
 
 class ConfigurationTest(unittest.TestCase):
-    def test_categories_should_be_retrieved_from_empty_datasource(self):
-        self._test_categories_provider([], [])
-
-    def test_categories_should_be_retrieved_from_datasource_with_just_header(self):
-        self._test_categories_provider(['x;y'], [])
-
-    def test_categories_should_be_retrieved_from_valid_datasource(self):
-        self._test_categories_provider(['x;y', '1;one', '2;two', '3;three'], ['1', '2', '3'])
-
     def test_articles_should_be_retrieved_from_empty_datasource(self):
         self._test_articles_provider([], [], [])
 
@@ -29,19 +20,6 @@ class ConfigurationTest(unittest.TestCase):
     def test_articles_should_be_retrieved_from_datasource_with_record_with_no_text_field(self):
         self._test_articles_provider([{'specialCoverage': [123], 'headline': ['xyz']}],
                                      ['123'], ['xyz'])
-
-    def _test_categories_provider(self, input, expected_output):
-        # given
-        datasource_mock = mock.MagicMock(spec=slovenian_press.configuration.AbstractDatasourceReader)
-        datasource_mock.read_all_lines.return_value = input
-
-        categories_provider = slovenian_press.configuration.CategoriesProvider(datasource_mock)
-
-        # when
-        result = categories_provider.provide()
-
-        # then
-        assert_that(result).is_equal_to(expected_output)
 
     def _test_articles_provider(self, input, expected_target_names, expected_data):
         # given
