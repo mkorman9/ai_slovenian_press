@@ -27,13 +27,13 @@ class ArticlesProvider(AbstractProvider):
 
     def provide(self):
         """
-        :rtype: dict[int, string]
+        :rtype: list[tuple[int, string]]
         """
         with open(self._file_path, 'r') as f:
             structure = json.load(f, encoding=self.SOURCE_ARTICLE_ENCODING)
-            return {article['specialCoverage'][0]:
-                        self._normalize_text(article.get('text', article.get('headline'))[0])
-                    for article in structure}
+            return [(article['specialCoverage'][0],
+                        self._normalize_text(article.get('text', article.get('headline'))[0]))
+                    for article in structure]
 
     def _normalize_text(self, text):
         normalized_text = text.replace("\\n", "\n").encode(self.TARGET_ARTICLE_ENCODING)
