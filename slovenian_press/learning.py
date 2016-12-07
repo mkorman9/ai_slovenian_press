@@ -31,7 +31,7 @@ class LearningModel(object):
         :type feature_extractor: FeatureExtractor
         """
         self.feature_extractor = feature_extractor
-        classifier = MLPClassifier(activation='relu', hidden_layer_sizes=(1500, 800, 300), max_iter=1000)
+        classifier = MLPClassifier(activation='relu', hidden_layer_sizes=(2000, 1000, 500), max_iter=1000)
         self.bayes_model = classifier.fit(self.feature_extractor.extracted_training_set_features,
                                           self.feature_extractor.training_set.target_names)
 
