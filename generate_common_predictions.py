@@ -10,7 +10,7 @@ def main():
     best_predictions = slovenian_press.configuration.FileCsvReader(slovenian_press.commons.BEST_PREDICTIONS_FILE_PATH)\
         .read_columns()
 
-    common_predictions_map = {id: [prediction.strip(), 0] for id, prediction in best_predictions.values}
+    common_predictions_map = {id: [prediction.strip()] for id, prediction in best_predictions.values}
 
     for iteration in xrange(len(sys.argv[1])):
         feature_extractor = slovenian_press.learning.FeatureExtractor(training_set)
@@ -18,8 +18,7 @@ def main():
         predictions = {id: prediction for id, prediction in zip(testing_set.id, learning_model.predict(testing_set))}
 
         for article_id, prediction in predictions.iteritems():
-            if common_predictions_map[article_id][0] == prediction:
-                common_predictions_map[article_id][1] += 1
+            common_predictions_map[article_id].append(prediction)
 
     print(common_predictions_map)
 
