@@ -3,9 +3,9 @@ import sys
 
 
 def main():
-    training_set = slovenian_press.configuration.read_articles_set_from_file(
+    training_set = slovenian_press.text.read_articles_set_from_file(
             slovenian_press.commons.TRAINING_SET_FILE_LOCATION)
-    testing_set = slovenian_press.configuration.read_articles_set_from_file(
+    testing_set = slovenian_press.text.read_articles_set_from_file(
         slovenian_press.commons.TESTING_SET_FILE_PATH)
     best_predictions = slovenian_press.configuration.FileCsvReader(slovenian_press.commons.BEST_PREDICTIONS_FILE_PATH)\
         .read_columns()
