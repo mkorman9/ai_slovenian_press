@@ -32,9 +32,9 @@ class LearningModel(object):
         """
         self.feature_extractor = feature_extractor
         classifier = MLPClassifier(activation='relu', hidden_layer_sizes=(2000, 500), max_iter=1000)
-        self.bayes_model = classifier.fit(self.feature_extractor.extracted_training_set_features,
-                                          self.feature_extractor.training_set.target_names)
+        self.mlp_model = classifier.fit(self.feature_extractor.extracted_training_set_features,
+                                        self.feature_extractor.training_set.target_names)
 
     def predict(self, testing_set):
         extracted_features = self.feature_extractor.extract_features(testing_set.data)
-        return self.bayes_model.predict(extracted_features)
+        return self.mlp_model.predict(extracted_features)

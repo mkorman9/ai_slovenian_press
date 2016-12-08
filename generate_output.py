@@ -1,6 +1,4 @@
-import slovenian_press.configuration
-import slovenian_press.output
-import slovenian_press.commons
+import slovenian_press
 
 
 def main():

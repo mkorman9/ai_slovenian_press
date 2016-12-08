@@ -1,6 +1,5 @@
-import slovenian_press.configuration
+import slovenian_press
 from slovenian_press.learning import FeatureExtractor, LearningModel
-import slovenian_press.commons
 
 
 def main():
