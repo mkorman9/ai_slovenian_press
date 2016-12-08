@@ -1,4 +1,3 @@
-import math
 import itertools
 
 
@@ -41,6 +40,13 @@ class PredictionsAggregator(object):
             _, sureness = self._calculate_list_most_common_value_and_sureness(predictions_list)
             sureness_sum += sureness
         return sureness_sum / float(len(self.series))
+
+    def to_flat_structure(self):
+        """
+        :rtype: tuple[string, string]
+        """
+        average_predictions = self.calculate_average_predictions()
+        return average_predictions.keys(), average_predictions.values()
 
     def _merge_to_series(self, series):
         for id in series.keys():

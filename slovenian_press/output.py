@@ -1,7 +1,10 @@
+from aggregation import PredictionsAggregator
+
+
 class AbstractOutputSaver(object):
     def save(self, results):
         """
-        :type results: list[tuple[string, string]]
+        :type results: PredictionsAggregator
         """
         raise NotImplementedError()
 
@@ -13,7 +16,7 @@ class CsvFileOutputSaver(AbstractOutputSaver):
     def save(self, results):
         with open(self._file_path, 'w') as f:
             f.write('id;specialCoverage\n')
-            for id, category in results:
+            for id, category in results.to_flat_structure():
                 f.write('{};{}\n'.format(id, category))
 
 

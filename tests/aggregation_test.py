@@ -71,3 +71,20 @@ class PredictionsAggregatorTest(unittest.TestCase):
 
         # then
         assert_that(self.aggregator.calculate_average_sureness_for_predictions()).is_equal_to(0.75)
+
+    def test_should_provide_flat_structure(self):
+        # given
+        ids = ['1', '2', '3']
+        predictions1 = ['147', '152', '149']
+        predictions2 = ['157', '148', '159']
+        predictions3 = ['147', '148', '149']
+
+        # when
+        self.aggregator.add_series(ids, predictions1)
+        self.aggregator.add_series(ids, predictions2)
+        self.aggregator.add_series(ids, predictions3)
+
+        # then
+        final_ids, final_predictions = self.aggregator.to_flat_structure()
+        assert_that(sorted(final_ids)).is_equal_to(['1', '2', '3'])
+        assert_that(sorted(final_predictions)).is_equal_to(['147', '148', '149'])
