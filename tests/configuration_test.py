@@ -42,6 +42,19 @@ class ConfigurationTest(unittest.TestCase):
                                      expected_target_names=['123'],
                                      expected_data=[''])
 
+    def test_csv_reader(self):
+        # given
+        input = ['x;y', '1;2', '3;4']
+        parser = slovenian_press.configuration.AbstractCsvReader()
+
+        # when
+        headers, values = parser._parse(input)
+
+        # then
+        assert_that(headers).is_equal_to(['x', 'y'])
+        assert_that(values).is_equal_to([['1', '2'], ['3', '4']])
+
+
     def _test_articles_provider(self, input, expected_ids, expected_target_names, expected_data):
         # given
         datasource_mock = mock.MagicMock(spec=slovenian_press.configuration.AbstractDatasourceReader)

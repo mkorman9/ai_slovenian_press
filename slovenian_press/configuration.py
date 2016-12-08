@@ -13,14 +13,6 @@ class AbstractDatasourceReader(object):
         raise NotImplementedError()
 
 
-class AbstractObjectPersistance(object):
-    def write(self, entity):
-        raise NotImplementedError()
-
-    def read(self):
-        raise NotImplementedError()
-
-
 class FileDatasourceReader(AbstractDatasourceReader):
     def __init__(self, file_path):
         self._file_path = file_path
@@ -28,6 +20,50 @@ class FileDatasourceReader(AbstractDatasourceReader):
     def read_json(self):
         with open(self._file_path, 'r') as f:
             return json.load(f, encoding=commons.SOURCE_ARTICLE_ENCODING)
+
+
+class CsvStructure(object):
+    def __init__(self, headers, values):
+        """
+        :type headers: list[string]
+        :type values: list[list[string]]
+        """
+        self.headers = headers
+        self.values = values
+
+
+class AbstractCsvReader(object):
+    def read_columns(self):
+        """
+        :rtype: CsvStructure
+        """
+        raise NotImplementedError()
+
+    def _parse(self, all_rows):
+        headers = self._split(all_rows[0])
+        values = [self._split(line) for line in all_rows[1:]]
+        return headers, values
+
+    def _split(self, line):
+        return line.split(';')
+
+
+class FileCsvReader(AbstractCsvReader):
+    def __init__(self, file_path):
+        self._file_path = file_path
+
+    def read_columns(self):
+        with open(self._file_path, 'r') as f:
+            headers, values = self._parse(f.readlines())
+            return CsvStructure(headers, values)
+
+
+class AbstractObjectPersistance(object):
+    def write(self, entity):
+        raise NotImplementedError()
+
+    def read(self):
+        raise NotImplementedError()
 
 
 class FileObjectPersistance(AbstractObjectPersistance):
