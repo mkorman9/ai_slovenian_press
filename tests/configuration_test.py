@@ -9,17 +9,38 @@ class ConfigurationTest(unittest.TestCase):
         self._test_articles_provider([], [], [], [])
 
     def test_articles_should_be_retrieved_from_datasource_with_single_record(self):
-        self._test_articles_provider([{'specialCoverage': [123], 'text': [u'xyz'], 'id': ['456']}],
-                                     ['456'], ['123'], ['xyz'])
+        self._test_articles_provider([{'specialCoverage': [123],
+                                       'text': [u'xyzw'],
+                                       'id': ['456'],
+                                       'headline': u'l',
+                                       'keywords': [u'a', u'b']}],
+                                     expected_ids=['456'],
+                                     expected_target_names=['123'],
+                                     expected_data=['xyzw'])
 
     def test_articles_should_be_retrieved_from_datasource_with_multiple_records(self):
-        self._test_articles_provider([{'specialCoverage': [123], 'text': [u'xyz'], 'id': ['456']},
-                                      {'specialCoverage': [666], 'text': [u'zyx'], 'id': ['567']}],
-                                     ['456', '567'], ['123', '666'], ['xyz', 'zyx'])
+        self._test_articles_provider([{'specialCoverage': [123],
+                                       'text': [u'xyz'],
+                                       'id': ['456'],
+                                       'headline': u'l',
+                                       'keywords': [u'a', u'b']},
+                                      {'specialCoverage': [666],
+                                       'text': [u'zyxz'],
+                                       'id': ['567'],
+                                       'headline': u'l',
+                                       'keywords': [u'abcd', u'bbcd']}],
+                                     expected_ids=['456', '567'],
+                                     expected_target_names=['123', '666'],
+                                     expected_data=['', 'zyxz abcd bbcd'])
 
     def test_articles_should_be_retrieved_from_datasource_with_record_with_no_text_field(self):
-        self._test_articles_provider([{'specialCoverage': [123], 'headline': [u'xyz'], 'id': ['456']}],
-                                     ['456'], ['123'], ['xyz'])
+        self._test_articles_provider([{'specialCoverage': [123],
+                                       'headline': [u'xyz'],
+                                       'id': ['456'],
+                                       'keywords': [u'a', u'b']}],
+                                     expected_ids=['456'],
+                                     expected_target_names=['123'],
+                                     expected_data=[''])
 
     def _test_articles_provider(self, input, expected_ids, expected_target_names, expected_data):
         # given
@@ -34,4 +55,4 @@ class ConfigurationTest(unittest.TestCase):
         # then
         assert_that(result.id).is_equal_to(expected_ids)
         assert_that(result.target_names).is_equal_to(expected_target_names)
-        assert_that(result.data).is_equal_to(expected_data)
+        assert_that([data.strip() for data in result.data]).is_equal_to(expected_data)

@@ -29,11 +29,11 @@ class TextNormalizer(TextProcessor):
                     )
                 )
             )
-        )
+        ).decode(commons.TARGET_ARTICLE_ENCODING, 'replace')
 
     # this method FTW! Adds about 5% of performance
     def _remove_long_words_endings(self, normalized_text):
-        normalized_text = ' '.join(word[:3] for word in normalized_text.split(' ') if len(word) > 5)
+        normalized_text = ' '.join(word[:3] if len(word) > 5 else word for word in normalized_text.split(' '))
         return normalized_text
 
     def _remove_digits(self, normalized_text):

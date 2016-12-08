@@ -74,9 +74,9 @@ class ArticlesProvider(AbstractProvider):
     @staticmethod
     def _extract_article_from_dict(article_dict, text_processor):
         id = str(article_dict['id'][0])
-        headline = ArticlesProvider._process_text(article_dict.get('headline')[0], text_processor).decode('utf-8', 'replace')
-        text = ArticlesProvider._process_text(article_dict.get('text', [u''])[0], text_processor).decode('utf-8', 'replace')
-        keywords = ' '.join([ArticlesProvider._process_text(t, text_processor) for t in article_dict.get('keywords')]).decode('utf-8', 'replace')
+        headline = ArticlesProvider._process_text(article_dict.get('headline')[0], text_processor)
+        text = ArticlesProvider._process_text(article_dict.get('text', [u''])[0], text_processor)
+        keywords = ' '.join([ArticlesProvider._process_text(t, text_processor) for t in article_dict.get('keywords')])
         category = str(article_dict.get('specialCoverage', [''])[0])
         return Article(id, headline + ' ' + text + ' ' + keywords, category)
 
