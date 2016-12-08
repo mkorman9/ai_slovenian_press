@@ -12,7 +12,7 @@ def main():
 
     common_predictions_map = {id: [prediction.strip()] for id, prediction in best_predictions.values}
 
-    for iteration in xrange(len(sys.argv[1])):
+    for iteration in xrange(int(sys.argv[1])):
         feature_extractor = slovenian_press.learning.FeatureExtractor(training_set)
         learning_model = slovenian_press.learning.LearningModel(feature_extractor)
         predictions = {id: prediction for id, prediction in zip(testing_set.id, learning_model.predict(testing_set))}
