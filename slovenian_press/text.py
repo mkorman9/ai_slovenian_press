@@ -1,6 +1,6 @@
 import unicodedata
 import commons
-from configuration import AbstractProvider, ArticlesSetModel
+from configuration import AbstractProvider, ArticlesSetModel, FileDatasourceReader
 from commons import Article
 
 
@@ -125,3 +125,7 @@ class ArticlesProvider(AbstractProvider):
     @staticmethod
     def _process_text(text, text_processor):
         return text_processor.process(text)
+
+
+def read_articles_set_from_file(file_path):
+    return ArticlesProvider(FileDatasourceReader(file_path)).provide()

@@ -99,10 +99,6 @@ class ArticlesSetModel(object):
         self.data = [article.text for article in input_data]
 
 
-def read_articles_set_from_file(file_path):
-    return ArticlesProvider(FileDatasourceReader(file_path)).provide()
-
-
 def save_entity_to_file(model, output_file_path):
     FileObjectPersistance(output_file_path).write(model)
 
