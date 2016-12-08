@@ -109,12 +109,39 @@ class ArticlesProvider(AbstractProvider):
 
     @staticmethod
     def _extract_article_from_dict(article_dict, text_processor):
-        id = str(article_dict['id'][0])
-        headline = ArticlesProvider._process_text(article_dict.get('headline')[0], text_processor)
-        text = ArticlesProvider._process_text(article_dict.get('text', [u''])[0], text_processor)
-        keywords = ' '.join([ArticlesProvider._process_text(t, text_processor) for t in article_dict.get('keywords')])
-        category = str(article_dict.get('specialCoverage', [''])[0])
+        id = ArticlesProvider._extract_id_from_dict(article_dict)
+        headline = ArticlesProvider._process_text(ArticlesProvider._extract_headline_from_dict(article_dict),
+                                                  text_processor)
+        text = ArticlesProvider._process_text(ArticlesProvider._extract_text_from_dict(article_dict),
+                                              text_processor)
+        keywords = ArticlesProvider._join_keywords(article_dict, text_processor)
+        category = ArticlesProvider._extract_category_from_dict(article_dict)
         return Article(id, headline + ' ' + text + ' ' + keywords, category)
+
+    @staticmethod
+    def _extract_id_from_dict(article_dict):
+        return str(article_dict['id'][0])
+
+    @staticmethod
+    def _extract_headline_from_dict(article_dict):
+        return article_dict.get('headline')[0]
+
+    @staticmethod
+    def _extract_text_from_dict(article_dict):
+        return article_dict.get('text', [u''])[0]
+
+    @staticmethod
+    def _extract_keywords_from_dict(article_dict):
+        return article_dict.get('keywords')
+
+    @staticmethod
+    def _extract_category_from_dict(article_dict):
+        return str(article_dict.get('specialCoverage', [''])[0])
+
+    @staticmethod
+    def _join_keywords(article_dict, text_processor):
+        return ' '.join([ArticlesProvider._process_text(t, text_processor)
+                         for t in ArticlesProvider._extract_keywords_from_dict(article_dict)])
 
     @staticmethod
     def _process_text(text, text_processor):
