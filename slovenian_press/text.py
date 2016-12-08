@@ -21,11 +21,36 @@ class AccentsRemover(TextProcessor):
 
 class TextNormalizer(TextProcessor):
     def process(self, text):
+        return self._convert_to_lower(
+            self._remove_punctuation_signs(
+                self._remove_words_shorter_than_3(
+                    self._remove_digits(
+                        self._remove_long_words_endings(text)
+                    )
+                )
+            )
+        )
+
+    # this method FTW! Adds about 5% of performance
+    def _remove_long_words_endings(self, normalized_text):
+        normalized_text = ' '.join(word[:3] for word in normalized_text.split(' ') if len(word) > 5)
+        return normalized_text
+
+    def _remove_digits(self, normalized_text):
+        normalized_text = ' '.join(word for word in normalized_text.split(' ') if not word.isdigit())
+        return normalized_text
+
+    def _remove_words_shorter_than_3(self, normalized_text):
+        normalized_text = ' '.join(word for word in normalized_text.split(' ') if len(word) > 3)
+        return normalized_text
+
+    def _convert_to_lower(self, text):
         normalized_text = text.lower()
+        return normalized_text
+
+    def _remove_punctuation_signs(self, normalized_text):
         for punctuation_character in commons.PUNCTUATION_SIGNS:
             normalized_text = normalized_text.replace(punctuation_character, '')
-        normalized_text = ' '.join(word for word in normalized_text.split(' ') if len(word) > 3 and not word.isdigit())
-        normalized_text = ' '.join(word[:3] for word in normalized_text.split(' ') if len(word) > 5)
         return normalized_text
 
 
