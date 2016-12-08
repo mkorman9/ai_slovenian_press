@@ -1,5 +1,7 @@
 import unicodedata
 import commons
+from configuration import AbstractProvider, ArticlesSetModel
+from commons import Article
 
 
 class TextProcessor(object):
@@ -65,3 +67,61 @@ class TextProcessingChain(TextProcessor):
         for processor in self._chain:
             text = processor.process(text)
         return text
+
+
+class ArticlesProvider(AbstractProvider):
+    def provide(self):
+        """
+        :rtype: ArticlesSetModel
+        """
+        return ArticlesSetModel(self._process_data())
+
+    def _process_data(self):
+        """
+        :rtype: list[Article]
+        """
+        text_processor = TextProcessingChain()
+        text_processor.register(AccentsRemover())
+        text_processor.register(TextNormalizer())
+
+        return [self._extract_article_from_dict(article_dict, text_processor) for article_dict in self._datasource.read_json()]
+
+    @staticmethod
+    def _extract_article_from_dict(article_dict, text_processor):
+        id = ArticlesProvider._extract_id_from_dict(article_dict)
+        headline = ArticlesProvider._process_text(ArticlesProvider._extract_headline_from_dict(article_dict),
+                                                  text_processor)
+        text = ArticlesProvider._process_text(ArticlesProvider._extract_text_from_dict(article_dict),
+                                              text_processor)
+        keywords = ArticlesProvider._join_keywords(article_dict, text_processor)
+        category = ArticlesProvider._extract_category_from_dict(article_dict)
+        return Article(id, headline + ' ' + text + ' ' + keywords, category)
+
+    @staticmethod
+    def _extract_id_from_dict(article_dict):
+        return str(article_dict['id'][0])
+
+    @staticmethod
+    def _extract_headline_from_dict(article_dict):
+        return article_dict.get('headline')[0]
+
+    @staticmethod
+    def _extract_text_from_dict(article_dict):
+        return article_dict.get('text', [u''])[0]
+
+    @staticmethod
+    def _extract_keywords_from_dict(article_dict):
+        return article_dict.get('keywords')
+
+    @staticmethod
+    def _extract_category_from_dict(article_dict):
+        return str(article_dict.get('specialCoverage', [''])[0])
+
+    @staticmethod
+    def _join_keywords(article_dict, text_processor):
+        return ' '.join([ArticlesProvider._process_text(t, text_processor)
+                         for t in ArticlesProvider._extract_keywords_from_dict(article_dict)])
+
+    @staticmethod
+    def _process_text(text, text_processor):
+        return text_processor.process(text)
