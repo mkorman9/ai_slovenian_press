@@ -21,10 +21,10 @@ def main():
         aggregator.add_series(testing_set.id, learning_model.predict(testing_set))
 
     print('Average sureness: {}'.format(aggregator.calculate_average_sureness_for_predictions()))
-    print('Average predictions:')
-    print(aggregator.calculate_average_predictions())
     print('Average sureness for predictions:')
     print(aggregator.calculate_sureness_for_predictions())
+
+    slovenian_press.output.save_results_to_csv_file(slovenian_press.commons.OUTPUT_FILE_PATH, aggregator)
 
 if __name__ == '__main__':
     main()
